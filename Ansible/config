@@ -1,0 +1,5 @@
+## Packer Lab Hosts (manually added to /Library/Preferences/VMWare\ Fusion/vmnet8/dhcpd.conf)
+Host 192.168.222.*
+    User ansible
+    IdentitiesOnly yes
+    IdentityFile ~/.ssh/ed25519-ansible

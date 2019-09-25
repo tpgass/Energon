@@ -1,0 +1,11 @@
+# from galaxy
+- src: MindPointGroup.RHEL7-CIS
+  name: rhel7-cis
+- src: dev-sec.ssh-hardening
+  name: ssh-hardening
+- src: florianutz.Ubuntu1604-CIS
+  name: ubuntu1604-cis
+- src: jnv.unattended-upgrades
+  name: unattended-upgrades
+- src: samdoran.yum-cron
+  name: yum-cron

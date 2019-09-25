@@ -1,0 +1,97 @@
+{
+  "variables": {
+    "isopath": "file:{{env `PWD`}}/iso/CentOS-7-x86_64-DVD-1908.iso",
+    "iso_checksum": "dc5932260da8f26bcdce0c7ebf0f59ca",
+    "ssh_username": "ansible",
+    "vm_name": "centos7-server"
+  },
+
+  "builders": [
+      {
+      "type": "vmware-iso",
+      "iso_url": "{{user `isopath`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "none",
+        
+      "vm_name": "{{ user `vm_name` }}",
+      "output_directory": "output-vmware-centos7",
+        
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_wait_timeout": "5m",
+      "shutdown_command": "sudo -S shutdown -P now",
+      "headless": false,
+        
+      "version": 14,
+      "guest_os_type": "rhel7-64",
+      "cpus":1,
+      "memory": "2048",
+      "network":"nat",
+      "network_adapter_type": "vmxnet3",
+      "disk_size": 102400,
+      "disk_adapter_type": "scsi",
+      "disk_type_id": 1,
+      "vmdk_name": "{{ user `vm_name` }}-VirtualDisk",
+      "vmx_data_post": {
+        "ide0:0.startConnected": "FALSE",
+        "ide0:0.deviceType": "cdrom-raw",
+        "ide0:0.clientDevice": "TRUE",
+        "ide0:0.present": "FALSE",
+        "ide0:0.fileName": "emptyBackingString"
+      },
+    
+      "floppy_files": [
+        "{{template_dir}}/kickstart/centos7.cfg"
+      ],
+      
+      "boot_command": [
+        "<up><wait><tab> text inst.ks=hd:fd0:/centos7.cfg<enter><wait>"
+      ]
+      },
+      {
+        "type": "qemu",
+        "iso_url": "file:{{user `isopath`}}/CentOS-7-x86_64-DVD-1908.iso",
+        "iso_checksum": "{{user `iso_checksum`}}",
+        "iso_checksum_type": "none",
+        
+        "vm_name": "{{ user `vm_name` }}",
+        "output_directory": "output-qemu-centos7",
+        "shutdown_command": "sudo -S shutdown -P now",
+
+        "accelerator": "kvm",
+        "cpus":1,
+        "memory": "2048",
+        "net_device": "virtio-net",
+        "disk_size": 50000,
+        "disk_interface": "virtio-scsi",
+        "format": "qcow2",
+
+        "ssh_username": "{{ user `ssh_username` }}",
+        "ssh_password": "{{ user `ssh_password` }}",
+        "ssh_timeout": "8m",
+
+        "floppy_files": [
+          "{{template_dir}}/kickstart/centos7.cfg"
+        ],
+
+        "boot_wait": "10s",
+        "boot_command": [
+          "<up><wait><tab> text inst.ks=hd:fd0:/centos7.cfg<enter><wait>"
+        ]
+      }
+    ],
+  
+    "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "{{.Vars}} sudo -S -E bash -eux '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "{{template_dir}}/scripts/config.sh",
+        "{{template_dir}}/scripts/sshd.sh",
+        "{{template_dir}}/scripts/update.sh",
+        "{{template_dir}}/scripts/motd.sh"
+      ]
+    }
+  ]
+}

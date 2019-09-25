@@ -1,0 +1,19 @@
+## .gitignore for Energon
+
+## ignore disk images (floppies, ISOs, packer, etc)
+*.iso
+*.img
+*.flp
+
+## Ignore the packer output directory:
+**/output*
+**/packer_cache
+
+## Ansible temp files
+*.retry
+
+## log files
+**/*.log
+
+## sensitive stuff
+variables.json

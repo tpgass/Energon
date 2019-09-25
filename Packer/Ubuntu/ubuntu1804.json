@@ -1,0 +1,123 @@
+{
+  "variables": {
+    "isopath": "file:{{env `PWD`}}/iso/ubuntu-18.04.3-server-amd64.iso",
+    "iso_checksum": "cb7cd5a0c94899a04a536441c8b6d2bf",
+    "ssh_username": "ansible",
+    "vm_name": "ubuntu1804-server"
+  },
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "iso_url": "{{user `isopath`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "md5",
+
+      "vm_name": "{{ user `vm_name` }}",
+      "output_directory": "output-vmware-1804",
+
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_wait_timeout": "5m",
+      "shutdown_command": "sudo -S shutdown -P now",
+      "headless": false,
+
+      "version": 14,
+      "guest_os_type": "ubuntu-64",
+      "cpus": 1,
+      "memory": "2048",
+      "network": "nat",
+      "network_adapter_type": "vmxnet3",
+      "disk_size": 102400,
+      "disk_adapter_type": "scsi",
+      "disk_type_id": 1,
+      "vmdk_name": "{{ user `vm_name` }}-VirtualDisk",
+      "vmx_data_post": {
+        "ide0:0.startConnected": "FALSE",
+        "ide0:0.deviceType": "cdrom-raw",
+        "ide0:0.clientDevice": "TRUE",
+        "ide0:0.present": "FALSE",
+        "ide0:0.fileName": "emptyBackingString"
+      },
+
+      "floppy_files": [
+        "{{template_dir}}/floppy18/preseed.cfg"
+      ],
+      
+      "boot_wait": "5s",
+      "boot_command": [
+        "<enter><wait><f6><wait><esc><wait>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs>",
+        "/install/vmlinuz",
+        " initrd=/install/initrd.gz",
+        " priority=critical",
+        " locale=en_US",
+        " file=/media/preseed.cfg",
+        "<enter>"
+      ]
+    },
+    {
+      "type": "qemu",
+      "iso_url": "file:{{user `isopath`}}/ubuntu-18.04.3-server-amd64.iso",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "md5",
+
+      "vm_name": "{{ user `vm_name` }}",
+      "output_directory": "output-qemu-1804",
+      "shutdown_command": "sudo -S shutdown -P now",
+
+      "accelerator": "kvm",
+      "cpus": 1,
+      "memory": "2048",
+      "net_device": "virtio-net",
+      "disk_size": 50000,
+      "disk_interface": "virtio-scsi",
+      "format": "qcow2",
+
+      "ssh_username": "{{ user `ssh_username` }}",
+      "ssh_password": "{{ user `ssh_password` }}",
+      "ssh_timeout": "8m",
+
+      "boot_wait": "10s",
+      "boot_command": [
+        "<enter><wait><f6><wait><esc><wait>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs>",
+        "/install/vmlinuz",
+        " initrd=/install/initrd.gz",
+        " priority=critical",
+        " locale=en_US",
+        " file=/media/preseed.cfg",
+        "<enter>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "sudo -S -E bash -eux '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "{{template_dir}}/scripts/config.sh",
+        "{{template_dir}}/scripts/sshd.sh",
+        "{{template_dir}}/scripts/update.sh",
+        "{{template_dir}}/scripts/motd.sh",
+        "{{template_dir}}/scripts/cleanup.sh"
+      ]
+    }
+  ]
+}

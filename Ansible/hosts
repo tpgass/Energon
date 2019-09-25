@@ -1,0 +1,12 @@
+[all:vars]
+ansible_user=ansible
+ansible_ssh_private_key=$HOME/.ssh/ed25519-ansible
+
+[ubuntu-servers]
+ubuntu1804-server ansible_host=192.168.222.124
+
+[ubuntu-servers:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+[centos7-servers]
+centos75-server ansible_host=192.168.222.128

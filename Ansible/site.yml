@@ -1,0 +1,35 @@
+---
+## This playbook deploys Ubuntu & Centos CIS level 2 benchmarks
+- name: Manage Ubuntu
+  hosts: ubuntu-servers
+  become: true
+  roles:
+    - role: ubuntu1804-cis
+      ubuntu1804cis_rule_3_4_2: false   # don't set hosts.deny to deny ALL
+      ubuntu1804cis_rule_4_1_1_2: false # disables halting when auditd logs are full
+      ubuntu1804cis_rule_4_1_11: false  # disables auditing of file access attempts
+      ubuntu1804cis_rule_5_4_1_1: false # password rules, currently disabled
+      ubuntu1804cis_rule_5_4_1_2: false # ""
+      ubuntu1804cis_rule_5_4_1_3: false # ""
+      ubuntu1804cis_rule_5_4_1_4: false # ""
+      ubuntu1804cis_ipv6_required: false
+      ubuntu1804cis_config_aide: false
+      ubuntu1804cis_selinux_pol: permissive
+      ubuntu1804cis_time_synchronization: ntp
+      ubuntu1804cis_logrotate: "weekly"
+    - role: unattended-upgrades
+      unattended_origins_patterns:
+        - 'origin=Ubuntu,archive=${distro_codename}-security'
+        - 'o=Ubuntu,a=${distro_codename}'
+        - 'o=Ubuntu,a=${distro_codename}-updates'
+      unattended_remove_unused_dependencies: true
+      unattended_clean_interval: 7
+    #- role: hostname
+
+- name: Manage CentOS7
+  hosts: centos7-servers
+  become: true
+  roles:
+    - rhel7-cis
+    - ssh-hardening
+    - hostname

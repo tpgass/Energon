@@ -1,0 +1,88 @@
+{
+  "variables": {
+    "isopath": "{{env `PWD`}}/iso",
+    "iso_checksum": "9f7b3a8743c8659f330bfef6d706e632",
+    "vm_name":"Win10x64-1903"
+  },
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "iso_url": "file:{{user `isopath`}}/Win10_RS6-1903_BIZ_x86-X64-en_us.iso",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "none",
+
+      "vm_name": "{{ user `vm_name` }}",
+      "output_directory": "output-vmware-win10-1903",
+
+      "version": 14,
+      "guest_os_type": "windows9-64",
+      "cpus":2,
+      "memory": "2048",
+      "network":"nat",
+      "network_adapter_type": "vmxnet3",
+      "disk_size": 102400,
+      "disk_adapter_type": "pvscsi",
+      "disk_type_id": 1,
+      "usb": false,
+      "vmdk_name": "{{ user `vm_name` }}-VirtualDisk",
+
+      "boot_wait": "2s",
+      "boot_command": [
+        "<enter>"
+      ],
+
+      "headless": false,
+      "communicator": "winrm",
+      "winrm_username": "ansible",
+      "winrm_password": "{{ user `ssh_password` }}",
+      "winrm_timeout": "12h",
+      "shutdown_timeout": "1h",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "skip_compaction": false,
+
+      "tools_upload_flavor": "windows",
+      "tools_upload_path": "C:/Windows/Temp/windows.iso",
+
+      "vmx_data": {
+        "firmware": "efi",
+        "gui.fitguestusingnativedisplayresolution": "FALSE"
+      },
+
+      "floppy_dirs": [
+        "{{template_dir}}/setup/*"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "powershell",
+      "elevated_user": "ansible",
+      "elevated_password": "{{ user `ssh_password` }}",
+      "scripts": [
+        "{{template_dir}}/scripts/install-win10-baseline.ps1"
+      ]
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{template_dir}}/setup/configure-winrm.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart"
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{template_dir}}/scripts/update-windows.ps1",
+        "{{template_dir}}/scripts/disable-hibernate.ps1",
+        "{{template_dir}}/scripts/enable-uac.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_command": "powershell \"& {(Get-WmiObject win32_operatingsystem).LastBootUpTime > C:\\ProgramData\\lastboot.txt; Restart-Computer -force}\"",
+      "restart_check_command": "powershell -command \"& {if ((get-content C:\\ProgramData\\lastboot.txt) -eq (Get-WmiObject win32_operatingsystem).LastBootUpTime) {Write-Output 'Sleeping for 600 seconds to wait for reboot'; start-sleep 600} else {Write-Output 'Reboot complete'}}\""
+    }
+  ]
+}
