@@ -1,9 +1,9 @@
 {
   "variables": {
-    "isopath": "file:{{env `PWD`}}/iso/CentOS-7-x86_64-DVD-1908.iso",
-    "iso_checksum": "dc5932260da8f26bcdce0c7ebf0f59ca",
+    "isopath": "file:{{env `PWD`}}/iso/CentOS-8-x86_64-1905-dvd1.iso",
+    "iso_checksum": "e15fb0e51726de0a4128448b9bd63e7b",
     "ssh_username": "ansible",
-    "vm_name": "centos7-server"
+    "vm_name": "centos8-server"
   },
 
   "builders": [
@@ -14,7 +14,7 @@
       "iso_checksum_type": "none",
         
       "vm_name": "{{ user `vm_name` }}",
-      "output_directory": "output-vmware-centos7",
+      "output_directory": "output-vmware-centos8",
         
       "ssh_username": "{{ user `ssh_username` }}",
       "ssh_password": "{{ user `ssh_password` }}",
@@ -23,7 +23,7 @@
       "headless": false,
         
       "version": 14,
-      "guest_os_type": "rhel7-64",
+      "guest_os_type": "rhel8-64",
       "cpus":1,
       "memory": "2048",
       "network":"nat",
@@ -41,11 +41,11 @@
       },
     
       "floppy_files": [
-        "{{template_dir}}/kickstart/centos7.cfg"
+        "{{template_dir}}/kickstart/centos8.cfg"
       ],
       
       "boot_command": [
-        "<up><wait><tab> text inst.ks=hd:fd0:/centos7.cfg<enter><wait>"
+        "<up><wait><tab> text inst.ks=hd:fd0:/centos8.cfg<enter><wait>"
       ]
       },
       {
@@ -55,7 +55,7 @@
         "iso_checksum_type": "none",
         
         "vm_name": "{{ user `vm_name` }}",
-        "output_directory": "output-qemu-centos7",
+        "output_directory": "output-qemu-centos8",
         "shutdown_command": "sudo -S shutdown -P now",
 
         "accelerator": "kvm",
@@ -71,12 +71,12 @@
         "ssh_timeout": "8m",
 
         "floppy_files": [
-          "{{template_dir}}/kickstart/centos7.cfg"
+          "{{template_dir}}/kickstart/centos8.cfg"
         ],
 
         "boot_wait": "10s",
         "boot_command": [
-          "<up><wait><tab> text inst.ks=hd:fd0:/centos7.cfg<enter><wait>"
+          "<up><wait><tab> text inst.ks=hd:fd0:/centos8.cfg<enter><wait>"
         ]
       }
     ],
