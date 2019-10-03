@@ -11,8 +11,8 @@ EOF
 sysctl -p > /dev/null
 
 ## Enable epel repos
-yum -y install epel-release
-yum -y install htop
+#yum -y install epel-release
+#yum -y install htop
 
 ## add ssh key for ansible later
 sudo -u ${SSH_USER} mkdir -p /home/${SSH_USER}/.ssh
