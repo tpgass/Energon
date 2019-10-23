@@ -17,7 +17,7 @@ ufw limit 22
 ufw enable
 
 sudo -u ${SSH_USER} mkdir -p /home/${SSH_USER}/.ssh
-sudo -u ${SSH_USER} echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN/wZnXwxSNSBcW5zIDcrroYJVtLN1EVBv0L7NLsKtG8 2019-05-16 Ansible Lab SSH Key' > /home/${SSH_USER}/.ssh/authorized_keys
+sudo -u ${SSH_USER} echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILXInf2tN98U8NXwgHHt4rUY2qJssE9+27Rv3m9Mtjo4 trish@OSISS.local' > /home/${SSH_USER}/.ssh/authorized_keys
 
 # Set the systemwide vimrc file with some sane defaults
 tee /etc/vim/vimrc.local > /dev/null <<'EOF'

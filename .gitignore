@@ -15,5 +15,8 @@
 ## log files
 **/*.log
 
+## DS_Store bs
+**/.DS_Store
+
 ## sensitive stuff
 variables.json
